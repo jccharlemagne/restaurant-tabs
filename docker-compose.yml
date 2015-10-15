@@ -1,0 +1,37 @@
+application:
+  build: ./docker/code
+  volumes:
+    - .:/var/www/symfony
+    - ./var/logs/symfony:/var/www/symfony/app/logs
+  tty: true
+
+db:
+  image: mysql
+  volumes:
+    - ./docker/mysql/shared/mysql-data:/var/lib/mysql
+  ports:
+    - 13306:3306
+  environment:
+    MYSQL_ALLOW_EMPTY_PASSWORD: yes
+    MYSQL_DATABASE: restaurant_tabs
+    MYSQL_USER: root
+
+php:
+  build: ./docker/php-fpm
+  expose:
+    - 9000:9000
+  volumes_from:
+    - application
+  links:
+    - db
+
+nginx:
+  build: ./docker/nginx
+  ports:
+    - 11080:80
+  links:
+    - php
+  volumes_from:
+    - application
+  volumes:
+    - ./var/logs/nginx:/var/log/nginx
