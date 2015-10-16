@@ -1,3 +1,17 @@
-app:
-    resource: "@AppBundle/Controller/"
-    type:     annotation
+cp_front:
+    resource: "@CPFrontBundle/Resources/config/routing.yml"
+    host: "www.restaurant-tabs.{extension}"
+    defaults:
+        extension: com|local
+
+cp_back:
+    resource: "@CPBackBundle/Resources/config/routing.yml"
+    host: "bo.restaurant-tabs.{extension}"
+    defaults:
+        extension: com|local
+
+cp_partners:
+    resource: "@CPPartnersBundle/Resources/config/routing.yml"
+    host: "pro.restaurant-tabs.{extension}"
+    defaults:
+        extension: com|local

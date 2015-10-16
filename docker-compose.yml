@@ -24,6 +24,7 @@ php:
     - application
   links:
     - db
+  working_dir: /var/www/symfony
 
 nginx:
   build: ./docker/nginx

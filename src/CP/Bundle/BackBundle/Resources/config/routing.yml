@@ -1,0 +1,3 @@
+cp_back_homepage:
+    path:     /hello/{name}
+    defaults: { _controller: CPBackBundle:Default:index }
