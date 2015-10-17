@@ -1,38 +1,55 @@
 application:
-  build: ./docker/code
-  volumes:
-    - .:/var/www/symfony
-    - ./var/logs/symfony:/var/www/symfony/app/logs
-  tty: true
+    build: ./docker/code
+    volumes:
+        - .:/var/www/symfony
+        - ./var/logs/symfony:/var/www/symfony/app/logs
+    tty: true
 
 db:
-  image: mysql
-  volumes:
-    - ./docker/mysql/shared/mysql-data:/var/lib/mysql
-  ports:
-    - 13306:3306
-  environment:
-    MYSQL_ALLOW_EMPTY_PASSWORD: yes
-    MYSQL_DATABASE: restaurant_tabs
-    MYSQL_USER: root
+    image: mysql
+    volumes:
+        - ./docker/mysql/shared/mysql-data:/var/lib/mysql
+    ports:
+        - 13306:3306
+    environment:
+        MYSQL_ALLOW_EMPTY_PASSWORD: yes
+        MYSQL_DATABASE: restaurant_tabs
+        MYSQL_USER: root
 
 php:
-  build: ./docker/php-fpm
-  expose:
-    - 9000:9000
-  volumes_from:
-    - application
-  links:
-    - db
-  working_dir: /var/www/symfony
+    build: ./docker/php-fpm
+    expose:
+        - 9000:9000
+    volumes_from:
+        - application
+    links:
+        - db
+    working_dir: /var/www/symfony
 
 nginx:
-  build: ./docker/nginx
-  ports:
-    - 11080:80
-  links:
-    - php
-  volumes_from:
-    - application
-  volumes:
-    - ./var/logs/nginx:/var/log/nginx
+    build: ./docker/nginx
+    ports:
+        - 11080:80
+    links:
+        - php
+    volumes_from:
+        - application
+    volumes:
+        - ./var/logs/nginx:/var/log/nginx
+
+nodejs: &nodejs
+    image: node
+    volumes:
+        - .:/var/www/symfony
+        - ./docker/nodejs/shared/.npmrc:/root/.npmrc
+    working_dir: /var/www/symfony
+
+npminstall:
+    <<: *nodejs
+    working_dir: /var/www/symfony/front-end-assets/js
+    entrypoint: ['npm', 'install', '--save', '--allow-root', '--config.interactive=false']
+
+bowerinstall:
+    <<: *nodejs
+    working_dir: /var/www/symfony/front-end-assets
+    entrypoint: ['node', '/var/www/symfony/front-end-assets/js/node_modules/.bin/bower', 'install', '--save', '--allow-root', '--config.interactive=false']
